@@ -1,0 +1,24 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  creationTimestamp: null
+  generateName: nodejs-pipeline-run-
+  namespace: default
+spec:
+  params:
+  - name: git_url
+    value: https://github.com/avinashupadhya99/kubegen
+  - name: imageTag
+    value: "0.1"
+  - name: imageUrl
+    value: avinashupadhya99/kubegen
+  pipelineRef:
+    name: nodejs-pipeline
+  workspaces:
+  - name: kubegen-ws
+    persistentVolumeClaim:
+      claimName: tekton-pvc
+  - name: docker-reg-creds
+    secret:
+      secretName: docker-creds
+status: {}

@@ -1,9 +1,9 @@
 # ---------cluster
 create-cluster:
-	kind create cluster --name k8s-playground --config kind-config.yaml
+	kind create cluster --name kube-playground --config kind-config.yaml
 
 delete-cluster:
-	kind delete cluster --name k8s-playground
+	kind delete cluster --name kube-playground
 
 # ---------ingress
 # nginx
@@ -52,3 +52,14 @@ test-request:
 instll-knative:
 	kubectl apply --filename https://github.com/knative/serving/releases/download/knative-v1.1.0/serving-crds.yaml
 	kubectl apply --filename https://github.com/knative/serving/releases/download/knative-v1.1.0/serving-core.yaml
+
+# tekton
+# 参考: https://hashnode.com/post/tekton-ci-simplified-ckzleauyw0n6beks1diq6ejvv
+install-tekton:
+	kubectl apply --filename https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml
+	kubectl apply --filename https://storage.googleapis.com/tekton-releases/dashboard/latest/tekton-dashboard-release.yaml
+	brew install tektoncd-cli
+
+run:
+	kubectl apply ./tekton
+	kubectl create -f pipelinerun.yaml

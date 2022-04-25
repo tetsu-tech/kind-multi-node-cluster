@@ -1,0 +1,73 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: nodejs-pipeline
+spec:
+  params:
+  - name: git_url
+    default: https://github.com/avinashupadhya99/kubegen
+    type: string
+  - name: imageUrl
+    default: avinashupadhya99/kubegen
+    type: string
+  - name: imageTag
+    default: latest
+    type: string
+  workspaces:
+    - name: kubegen-ws
+    - name: docker-reg-creds
+  tasks:
+  - name: git-clone
+    taskRef:
+      name: git-clone
+    workspaces:
+    - name: output
+      workspace: kubegen-ws
+    params:
+    - name: url
+      value: $(params.git_url)
+  - name: install-dependencies
+    taskRef:
+      name: npm
+    workspaces:
+    - name: source
+      workspace: kubegen-ws
+    params:
+    - name: ARGS
+      value: ["install"]
+    runAfter:
+    - git-clone
+  - name: unit-test
+    taskRef:
+      name: npm
+    workspaces:
+    - name: source
+      workspace: kubegen-ws
+    params:
+    - name: ARGS
+      value: ["test"]
+    runAfter:
+    - install-dependencies
+  - name: dockerfile-lint
+    taskRef:
+      name: hadolint
+    workspaces:
+    - name: source
+      workspace: kubegen-ws
+    runAfter:
+    - git-clone
+  # MEMO: Dockerのsecretを用意するのが面倒なのでコメントアウト
+  # - name: build-and-push
+  #   taskRef:
+  #     name: kaniko
+  #   workspaces:
+  #   - name: source
+  #     workspace: kubegen-ws
+  #   - name: dockerconfig
+  #     workspace: docker-reg-creds
+  #   params:
+  #   - name: IMAGE
+  #     value: $(params.imageUrl):$(params.imageTag)
+  #   runAfter:
+  #   - unit-test
+  #   - dockerfile-lint
