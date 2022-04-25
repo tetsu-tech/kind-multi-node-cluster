@@ -46,3 +46,9 @@ delete-target:
 test-request:
 	curl -i localhost/foo
 	curl -i localhost/bar
+
+# ----------others
+# 参考: https://docs.konghq.com/kubernetes-ingress-controller/latest/guides/using-kong-with-knative/
+instll-knative:
+	kubectl apply --filename https://github.com/knative/serving/releases/download/knative-v1.1.0/serving-crds.yaml
+	kubectl apply --filename https://github.com/knative/serving/releases/download/knative-v1.1.0/serving-core.yaml
